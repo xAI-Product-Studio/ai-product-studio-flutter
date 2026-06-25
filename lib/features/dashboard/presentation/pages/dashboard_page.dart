@@ -21,12 +21,12 @@ class _DashboardPageState extends State<DashboardPage> {
   void initState() {
     super.initState();
     context.read<DashboardBloc>().add(const DashboardDataRequested());
-  }
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    context.read<DashboardBloc>().add(const DashboardDataRequested());
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        context.read<DashboardBloc>().add(const DashboardDataRequested());
+      }
+    });
   }
 
   @override
@@ -659,8 +659,8 @@ class _DashboardPageState extends State<DashboardPage> {
           Expanded(
             child: ClipRRect(
               borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-              child: gen.imageUrl != null
-                  ? Image.network(gen.imageUrl, fit: BoxFit.cover, width: double.infinity,
+              child: gen.image?.imageUrl != null
+                  ? Image.network(gen.image!.imageUrl, fit: BoxFit.cover, width: double.infinity,
                       loadingBuilder: (_, child, progress) {
                         if (progress == null) return child;
                         return Container(
@@ -678,7 +678,7 @@ class _DashboardPageState extends State<DashboardPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  gen.productName ?? 'Ürün',
+                  gen.request.productName.isNotEmpty ? gen.request.productName : 'Ürün',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(fontSize: isDesktop ? 13 : 12, fontWeight: FontWeight.w700, color: const Color(0xFF1E1B4B)),

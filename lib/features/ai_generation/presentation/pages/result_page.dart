@@ -13,6 +13,9 @@ import '../../../../core/widgets/error_snackbar.dart';
 import '../../domain/entities/ad_copy_entity.dart';
 import '../../domain/entities/generation_result_entity.dart';
 import '../../domain/entities/platform_config_entity.dart';
+import '../../../dashboard/presentation/bloc/dashboard_bloc.dart';
+import '../../../dashboard/presentation/bloc/dashboard_event.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ResultPage extends StatelessWidget {
   final String generationId;
@@ -79,7 +82,10 @@ class ResultPage extends StatelessWidget {
                 Gap(16.h),
                 if (result.creditsUsed > 0)
                   GestureDetector(
-                    onTap: () => context.go(AppRoutes.dashboard),
+                    onTap: () {
+                      context.go(AppRoutes.dashboard);
+                      context.read<DashboardBloc>().add(const DashboardDataRequested());
+                    },
                     child: Container(
                       padding: const EdgeInsets.all(14),
                       decoration: BoxDecoration(
@@ -111,7 +117,10 @@ class ResultPage extends StatelessWidget {
                 Gap(12.h),
                 AppButton(
                   label: 'Geçmişe Göz At',
-                  onPressed: () => context.go(AppRoutes.dashboard),
+                  onPressed: () {
+                    context.go(AppRoutes.dashboard);
+                    context.read<DashboardBloc>().add(const DashboardDataRequested());
+                  },
                   isOutlined: true,
                 ),
                 Gap(32.h),

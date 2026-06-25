@@ -123,6 +123,9 @@ class AiGenerationBloc extends Bloc<AiGenerationEvent, AiGenerationState> {
               isFinished = true;
               try {
                 getIt<DashboardBloc>().add(const DashboardDataRequested());
+                Future.delayed(const Duration(seconds: 2), () {
+                  getIt<DashboardBloc>().add(const DashboardDataRequested());
+                });
               } catch (_) {}
             } else if (updatedResult.status == GenerationStatus.failed) {
               isFinished = true;

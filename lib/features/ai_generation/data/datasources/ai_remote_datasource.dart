@@ -115,8 +115,17 @@ class AiRemoteDataSourceImpl implements AiRemoteDataSource {
     try {
       final response = await _dioClient.get<Map<String, dynamic>>(ApiEndpoints.generationHistory,
         queryParameters: {'page': page, 'limit': limit, if (platformFilter != null) 'platform': platformFilter.name});
-      final items = response.data!['items'] as List<dynamic>;
-      return items.map((e) => GenerationResultModel.fromJson(e as Map<String, dynamic>)).toList();
+      final items = response.data!['results'] as List<dynamic>;
+      final parsed = <GenerationResultModel>[];
+      for (final e in items) {
+        try {
+          parsed.add(GenerationResultModel.fromJson(e as Map<String, dynamic>));
+        } catch (parseError) {
+          print('PARSE ERROR: $parseError');
+          print('ITEM: $e');
+        }
+      }
+      return parsed;
     } on NetworkException {
       return _buildMockHistory();
     } on ServerException { rethrow; }

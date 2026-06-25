@@ -31,10 +31,6 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
     emit(const DashboardLoading());
 
     final authState = _authBloc.state;
-    if (authState is! AuthAuthenticated) {
-      emit(const DashboardFailure(message: 'Kullanıcı oturumu bulunamadı.'));
-      return;
-    }
 
     // /users/me den taze veri çek
     final userResult = await _getCurrentUserUseCase();
@@ -45,9 +41,14 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
     );
 
     final user = userResult.fold(
-      (failure) => authState.user,
+      (failure) {
+        if (authState is AuthAuthenticated) return authState.user;
+        emit(const DashboardFailure(message: 'Kullanıcı oturumu bulunamadı.'));
+        return null;
+      },
       (freshUser) => freshUser,
     );
+    if (user == null) return;
 
     _logger.i('Dashboard user kredisi: ${user.credits}');
 
