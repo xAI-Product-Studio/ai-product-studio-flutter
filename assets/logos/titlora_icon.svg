@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48">
+  <!-- App icon — kare + T + spark -->
+  <rect width="48" height="48" rx="12" fill="#1E1B4B"/>
+
+  <!-- T yatay -->
+  <rect x="9" y="12" width="30" height="7" rx="2.5" fill="white"/>
+  <!-- T dikey -->
+  <rect x="20.5" y="12" width="7" height="26" rx="2.5" fill="white"/>
+
+  <!-- Mor spark -->
+  <circle cx="38" cy="36" r="6" fill="#7C3AED"/>
+  <circle cx="38" cy="36" r="3" fill="white"/>
+</svg>
