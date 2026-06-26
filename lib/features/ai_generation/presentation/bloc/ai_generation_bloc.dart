@@ -152,7 +152,7 @@ class AiGenerationBloc extends Bloc<AiGenerationEvent, AiGenerationState> {
     final result = await _getHistoryUseCase(GetHistoryParams(page: event.page, platformFilter: event.platformFilter));
     result.fold(
       (failure) => emit(AiGenerationFailureState(message: failure.message)),
-      (results) => emit(AiGenerationHistoryLoaded(results: results, hasMore: results.length == 20, currentPage: event.page)),
+      (historyData) => emit(AiGenerationHistoryLoaded(results: historyData.results, hasMore: historyData.results.length == 20, currentPage: event.page)),
     );
   }
 

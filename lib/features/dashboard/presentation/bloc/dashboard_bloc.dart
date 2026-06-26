@@ -58,8 +58,9 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
 
     historyResult.fold(
       (failure) => emit(DashboardFailure(message: failure.message)),
-      (results) {
-        final total = results.length;
+      (historyData) {
+        final results = historyData.results;
+        final total = historyData.total;
         final images = results.where((r) => r.image != null).length;
         final texts = results.where((r) => r.adCopy != null).length;
         emit(

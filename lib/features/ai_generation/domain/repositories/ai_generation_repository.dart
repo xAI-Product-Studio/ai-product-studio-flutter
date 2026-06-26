@@ -18,7 +18,7 @@ abstract interface class AiGenerationRepository {
     required GenerationRequestEntity request,
   });
 
-  Future<Either<Failure, List<GenerationResultEntity>>> getHistory({
+  Future<Either<Failure, ({List<GenerationResultEntity> results, int total})>> getHistory({
     int page = 1,
     int limit = 20,
     SupportedPlatform? platformFilter,

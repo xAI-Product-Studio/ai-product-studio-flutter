@@ -70,10 +70,10 @@ class AiGenerationRepositoryImpl implements AiGenerationRepository {
   }
 
   @override
-  Future<Either<Failure, List<GenerationResultEntity>>> getHistory({int page = 1, int limit = 20, SupportedPlatform? platformFilter}) async {
+  Future<Either<Failure, ({List<GenerationResultEntity> results, int total})>> getHistory({int page = 1, int limit = 20, SupportedPlatform? platformFilter}) async {
     try {
-      final results = await _remoteDataSource.getHistory(page: page, limit: limit, platformFilter: platformFilter);
-      return Right(results);
+      final data = await _remoteDataSource.getHistory(page: page, limit: limit, platformFilter: platformFilter);
+      return Right((results: data.results, total: data.total));
     } on ServerException catch (e) {
       return Left(ServerFailure(message: e.message, statusCode: e.statusCode));
     } on NetworkException catch (e) {

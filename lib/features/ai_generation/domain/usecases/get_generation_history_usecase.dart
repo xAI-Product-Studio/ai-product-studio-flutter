@@ -12,7 +12,7 @@ class GetGenerationHistoryUseCase {
   final AiGenerationRepository _repository;
   const GetGenerationHistoryUseCase(this._repository);
 
-  Future<Either<Failure, List<GenerationResultEntity>>> call(GetHistoryParams params) {
+  Future<Either<Failure, ({List<GenerationResultEntity> results, int total})>> call(GetHistoryParams params) {
     return _repository.getHistory(
       page: params.page,
       limit: params.limit,

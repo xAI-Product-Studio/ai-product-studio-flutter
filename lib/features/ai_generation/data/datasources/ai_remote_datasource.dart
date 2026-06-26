@@ -13,7 +13,7 @@ abstract interface class AiRemoteDataSource {
   Future<GenerationResultModel> generateAll({required GenerationRequestEntity request});
   Future<GenerationResultModel> generateImage({required GenerationRequestEntity request});
   Future<GenerationResultModel> generateAdCopy({required GenerationRequestEntity request});
-  Future<List<GenerationResultModel>> getHistory({int page = 1, int limit = 20, SupportedPlatform? platformFilter});
+  Future<({List<GenerationResultModel> results, int total})> getHistory({int page = 1, int limit = 20, SupportedPlatform? platformFilter});
   Future<GenerationResultModel> getGenerationById({required String id});
   Future<void> toggleFavorite({required String id, required bool isFavorite});
 }
@@ -111,7 +111,7 @@ class AiRemoteDataSourceImpl implements AiRemoteDataSource {
   }
 
   @override
-  Future<List<GenerationResultModel>> getHistory({int page = 1, int limit = 20, SupportedPlatform? platformFilter}) async {
+  Future<({List<GenerationResultModel> results, int total})> getHistory({int page = 1, int limit = 20, SupportedPlatform? platformFilter}) async {
     try {
       final response = await _dioClient.get<Map<String, dynamic>>(ApiEndpoints.generationHistory,
         queryParameters: {'page': page, 'limit': limit, if (platformFilter != null) 'platform': platformFilter.name});
@@ -125,13 +125,13 @@ class AiRemoteDataSourceImpl implements AiRemoteDataSource {
           print('ITEM: $e');
         }
       }
-      return parsed;
+      return (results: parsed, total: response.data!['total'] as int? ?? parsed.length);
     } on NetworkException {
-      return _buildMockHistory();
+      final mock = _buildMockHistory(); return (results: mock, total: mock.length);
     } on ServerException { rethrow; }
     catch (e) {
       if (e is NetworkException) {
-        return _buildMockHistory();
+        final mock = _buildMockHistory(); return (results: mock, total: mock.length);
       }
       throw const ServerException(message: 'Geçmiş veriler alınırken bir hata oluştu.');
     }
