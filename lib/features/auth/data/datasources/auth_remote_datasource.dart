@@ -111,6 +111,15 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
   @override
   Future<void> forgotPassword({required String email}) async {
-    await Future.delayed(const Duration(seconds: 1));
+    try {
+      await _dioClient.post(
+        '/auth/forgot-password',
+        queryParameters: {'email': email},
+      );
+    } on ServerException {
+      rethrow;
+    } catch (e) {
+      throw ServerException(message: e.toString());
+    }
   }
 }
