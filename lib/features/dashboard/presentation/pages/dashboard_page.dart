@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../../auth/presentation/bloc/auth_event.dart';
+import '../../../auth/domain/entities/user_entity.dart';
 import '../bloc/dashboard_bloc.dart';
 import '../bloc/dashboard_event.dart';
 import '../bloc/dashboard_state.dart';
@@ -310,10 +311,12 @@ class _DashboardPageState extends State<DashboardPage> {
   // ─── CREDIT CARD ─────────────────────────────────────────────────────────────
 
   Widget _buildCreditCard(DashboardState state, bool isDesktop) {
-    final credits = state is DashboardLoaded ? state.credits : 3;
-    final maxCredits = 3;
-    final isUnlimited = credits == -1;
-    final usedRatio = isUnlimited ? 1.0 : (credits / maxCredits).clamp(0.0, 1.0);
+    final credits = state is DashboardLoaded ? state.credits : 5;
+    final plan = state is DashboardLoaded ? state.user.subscriptionPlan : SubscriptionPlan.free;
+    final maxCredits = plan == SubscriptionPlan.enterprise ? 150 : plan == SubscriptionPlan.professional ? 60 : 5;
+    final displayMax = credits > maxCredits ? credits : maxCredits;
+    final planName = plan == SubscriptionPlan.enterprise ? 'MAX' : plan == SubscriptionPlan.professional ? 'Pro' : 'Başlangıç';
+    final usedRatio = (credits / displayMax).clamp(0.0, 1.0);
 
     return Container(
       padding: EdgeInsets.all(isDesktop ? 24 : 16),
@@ -353,7 +356,7 @@ class _DashboardPageState extends State<DashboardPage> {
             textBaseline: TextBaseline.alphabetic,
             children: [
               Text(
-                isUnlimited ? '∞' : '$credits',
+                '$credits',
                 style: TextStyle(
                   fontSize: isDesktop ? 44 : 32,
                   fontWeight: FontWeight.w800,
@@ -363,7 +366,7 @@ class _DashboardPageState extends State<DashboardPage> {
               ),
               const SizedBox(width: 8),
               Text(
-                isUnlimited ? 'sınırsız' : '/ $maxCredits kredi',
+                '$credits / $displayMax kredi',
                 style: TextStyle(fontSize: isDesktop ? 15 : 13, color: const Color(0xFF9490A9)),
               ),
             ],
@@ -375,14 +378,14 @@ class _DashboardPageState extends State<DashboardPage> {
               value: usedRatio,
               backgroundColor: const Color(0xFFF3F2F8),
               valueColor: AlwaysStoppedAnimation<Color>(
-                credits <= 1 && !isUnlimited ? const Color(0xFFEF4444) : const Color(0xFF7C3AED),
+                credits <= 1 ? const Color(0xFFEF4444) : const Color(0xFF7C3AED),
               ),
               minHeight: 8,
             ),
           ),
           const SizedBox(height: 8),
           Text(
-            isUnlimited ? 'Sınırsız üretim hakkınız var' : '$credits kredi kaldı · Başlangıç Planı',
+            '$credits kredi kaldı · $planName Planı',
             style: TextStyle(fontSize: isDesktop ? 12 : 11, color: const Color(0xFF9490A9)),
           ),
           SizedBox(height: isDesktop ? 20 : 14),
@@ -405,7 +408,11 @@ class _DashboardPageState extends State<DashboardPage> {
                     const Icon(Icons.bolt_rounded, size: 16, color: Colors.white),
                     const SizedBox(width: 8),
                     Text(
-                      isUnlimited ? 'İşletme Planındasınız' : 'Pro\'ya Yükselt · ₺799/ay',
+                      plan == SubscriptionPlan.enterprise
+                          ? 'MAX Planındasınız'
+                          : plan == SubscriptionPlan.professional
+                              ? 'MAX\'a Yükselt · ₺890/ay'
+                              : 'Pro\'ya Yükselt · ₺390/ay',
                       style: TextStyle(fontSize: isDesktop ? 14 : 12, color: Colors.white, fontWeight: FontWeight.w700),
                     ),
                   ],

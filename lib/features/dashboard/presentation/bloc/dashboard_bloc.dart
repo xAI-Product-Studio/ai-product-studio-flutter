@@ -53,7 +53,7 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
     _logger.i('Dashboard user kredisi: ${user.credits}');
 
     final historyResult = await _getHistoryUseCase(
-      const GetHistoryParams(page: 1, limit: 20),
+      const GetHistoryParams(page: 1, limit: 100),
     );
 
     historyResult.fold(
