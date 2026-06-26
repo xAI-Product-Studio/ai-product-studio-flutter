@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../../auth/presentation/bloc/auth_event.dart';
+import '../../../auth/presentation/bloc/auth_state.dart';
 import '../../../auth/domain/entities/user_entity.dart';
 import '../bloc/dashboard_bloc.dart';
 import '../bloc/dashboard_event.dart';
@@ -32,26 +33,46 @@ class _DashboardPageState extends State<DashboardPage> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<DashboardBloc, DashboardState>(
-      builder: (context, state) {
-        final w = MediaQuery.of(context).size.width;
-        final isDesktop = w > 768;
-
-        return Scaffold(
-          backgroundColor: const Color(0xFFF8F7FF),
-          body: SingleChildScrollView(
-            padding: EdgeInsets.fromLTRB(
-              isDesktop ? 40 : 20,
-              isDesktop ? 40 : 20,
-              isDesktop ? 40 : 20,
-              40,
+    return BlocListener<AuthBloc, AuthState>(
+      listener: (context, authState) {
+        if (authState is AuthResendVerificationSuccess) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Mail gönderildi!'),
+              backgroundColor: Colors.green,
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (!isDesktop) _buildMobileHeader(state),
-                if (!isDesktop) const SizedBox(height: 24),
-                _buildGreeting(state, isDesktop),
+          );
+        } else if (authState is AuthResendVerificationFailure) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(authState.message),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      },
+      child: BlocBuilder<DashboardBloc, DashboardState>(
+        builder: (context, state) {
+          final w = MediaQuery.of(context).size.width;
+          final isDesktop = w > 768;
+
+          return Scaffold(
+            backgroundColor: const Color(0xFFF8F7FF),
+            body: SingleChildScrollView(
+              padding: EdgeInsets.fromLTRB(
+                isDesktop ? 40 : 20,
+                isDesktop ? 40 : 20,
+                isDesktop ? 40 : 20,
+                40,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (state is DashboardLoaded && !state.user.isEmailVerified)
+                    _buildVerificationBanner(context, isDesktop),
+                  if (!isDesktop) _buildMobileHeader(state),
+                  if (!isDesktop) const SizedBox(height: 24),
+                  _buildGreeting(state, isDesktop),
                 const SizedBox(height: 28),
                 if (isDesktop)
                   Row(
@@ -92,6 +113,79 @@ class _DashboardPageState extends State<DashboardPage> {
           ),
         );
       },
+    ),
+  );
+}
+
+  Widget _buildVerificationBanner(BuildContext context, bool isDesktop) {
+    final children = [
+      Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('⚠️', style: TextStyle(fontSize: 18)),
+          const SizedBox(width: 12),
+          const Expanded(
+            child: Text(
+              'E-posta adresinizi henüz doğrulamadınız. Lütfen gelen kutunuzu kontrol edin.',
+              style: TextStyle(
+                color: Color(0xFF92400E),
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ],
+      ),
+      if (!isDesktop) const SizedBox(height: 8),
+      Align(
+        alignment: isDesktop ? Alignment.centerRight : Alignment.centerLeft,
+        child: TextButton(
+          onPressed: () {
+            context.read<AuthBloc>().add(const AuthResendVerificationRequested());
+          },
+          style: TextButton.styleFrom(
+            backgroundColor: const Color(0xFF7C3AED),
+            foregroundColor: Colors.white,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(6),
+            ),
+            textStyle: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 13,
+            ),
+          ),
+          child: const Text('Tekrar Gönder'),
+        ),
+      ),
+    ];
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 20),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFEF3C7),
+        border: const Border(
+          left: BorderSide(color: Color(0xFFF59E0B), width: 4),
+        ),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: isDesktop
+          ? Row(
+              children: [
+                Expanded(child: children[0]),
+                const SizedBox(width: 16),
+                children[2],
+              ],
+            )
+          : Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                children[0],
+                children[1],
+                children[2],
+              ],
+            ),
     );
   }
 

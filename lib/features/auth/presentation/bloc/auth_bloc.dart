@@ -7,6 +7,7 @@ import '../../domain/usecases/get_current_user_usecase.dart';
 import '../../domain/usecases/login_usecase.dart';
 import '../../domain/usecases/logout_usecase.dart';
 import '../../domain/usecases/register_usecase.dart';
+import '../../domain/usecases/resend_verification_usecase.dart';
 import 'auth_event.dart';
 import 'auth_state.dart';
 
@@ -17,6 +18,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final LogoutUseCase _logoutUseCase;
   final GetCurrentUserUseCase _getCurrentUserUseCase;
   final ForgotPasswordUseCase _forgotPasswordUseCase;
+  final ResendVerificationUseCase _resendVerificationUseCase;
   final Logger _logger;
 
   AuthBloc(
@@ -25,6 +27,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     this._logoutUseCase,
     this._getCurrentUserUseCase,
     this._forgotPasswordUseCase,
+    this._resendVerificationUseCase,
     this._logger,
   ) : super(const AuthInitial()) {
     on<AuthCheckRequested>(_onAuthCheckRequested);
@@ -33,6 +36,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AuthLogoutRequested>(_onLogoutRequested);
     on<AuthForgotPasswordRequested>(_onForgotPasswordRequested);
     on<AuthUserRefreshRequested>(_onUserRefreshRequested);
+    on<AuthResendVerificationRequested>(_onResendVerificationRequested);
   }
 
   Future<void> _onAuthCheckRequested(
@@ -119,6 +123,17 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     result.fold(
       (failure) => _logger.w('Kullanıcı yenileme başarısız: ${failure.message}'),
       (user) => emit(AuthAuthenticated(user: user)),
+    );
+  }
+
+  Future<void> _onResendVerificationRequested(
+    AuthResendVerificationRequested event,
+    Emitter<AuthState> emit,
+  ) async {
+    final result = await _resendVerificationUseCase();
+    result.fold(
+      (failure) => emit(AuthResendVerificationFailure(message: failure.message)),
+      (_) => emit(const AuthResendVerificationSuccess()),
     );
   }
 }

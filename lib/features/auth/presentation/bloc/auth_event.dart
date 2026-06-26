@@ -52,3 +52,7 @@ final class AuthForgotPasswordRequested extends AuthEvent {
 final class AuthUserRefreshRequested extends AuthEvent {
   const AuthUserRefreshRequested();
 }
+
+final class AuthResendVerificationRequested extends AuthEvent {
+  const AuthResendVerificationRequested();
+}

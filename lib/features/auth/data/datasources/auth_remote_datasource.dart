@@ -21,6 +21,7 @@ abstract interface class AuthRemoteDataSource {
   Future<void> logout();
   Future<UserModel> getCurrentUser();
   Future<void> forgotPassword({required String email});
+  Future<void> resendVerification();
 }
 
 @Injectable(as: AuthRemoteDataSource)
@@ -116,6 +117,17 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         '/auth/forgot-password',
         queryParameters: {'email': email},
       );
+    } on ServerException {
+      rethrow;
+    } catch (e) {
+      throw ServerException(message: e.toString());
+    }
+  }
+
+  @override
+  Future<void> resendVerification() async {
+    try {
+      await _dioClient.post('/auth/resend-verification');
     } on ServerException {
       rethrow;
     } catch (e) {

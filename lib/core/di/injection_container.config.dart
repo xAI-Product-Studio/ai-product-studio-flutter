@@ -39,6 +39,8 @@ import '../../features/auth/domain/usecases/get_current_user_usecase.dart'
 import '../../features/auth/domain/usecases/login_usecase.dart' as _i188;
 import '../../features/auth/domain/usecases/logout_usecase.dart' as _i48;
 import '../../features/auth/domain/usecases/register_usecase.dart' as _i941;
+import '../../features/auth/domain/usecases/resend_verification_usecase.dart'
+    as _i958;
 import '../../features/auth/presentation/bloc/auth_bloc.dart' as _i797;
 import '../../features/dashboard/presentation/bloc/dashboard_bloc.dart'
     as _i652;
@@ -92,6 +94,17 @@ extension GetItInjectableX on _i174.GetIt {
         () => _i48.LogoutUseCase(gh<_i787.AuthRepository>()));
     gh.factory<_i941.RegisterUseCase>(
         () => _i941.RegisterUseCase(gh<_i787.AuthRepository>()));
+    gh.factory<_i958.ResendVerificationUseCase>(
+        () => _i958.ResendVerificationUseCase(gh<_i787.AuthRepository>()));
+    gh.singleton<_i797.AuthBloc>(() => _i797.AuthBloc(
+          gh<_i188.LoginUseCase>(),
+          gh<_i941.RegisterUseCase>(),
+          gh<_i48.LogoutUseCase>(),
+          gh<_i17.GetCurrentUserUseCase>(),
+          gh<_i560.ForgotPasswordUseCase>(),
+          gh<_i958.ResendVerificationUseCase>(),
+          gh<_i974.Logger>(),
+        ));
     gh.factory<_i168.GenerateAllUseCase>(
         () => _i168.GenerateAllUseCase(gh<_i785.AiGenerationRepository>()));
     gh.factory<_i764.GetGenerationHistoryUseCase>(() =>
@@ -102,14 +115,6 @@ extension GetItInjectableX on _i174.GetIt {
           gh<_i168.GenerateAllUseCase>(),
           gh<_i1067.GetPlatformConfigsUseCase>(),
           gh<_i764.GetGenerationHistoryUseCase>(),
-        ));
-    gh.singleton<_i797.AuthBloc>(() => _i797.AuthBloc(
-          gh<_i188.LoginUseCase>(),
-          gh<_i941.RegisterUseCase>(),
-          gh<_i48.LogoutUseCase>(),
-          gh<_i17.GetCurrentUserUseCase>(),
-          gh<_i560.ForgotPasswordUseCase>(),
-          gh<_i974.Logger>(),
         ));
     gh.lazySingleton<_i652.DashboardBloc>(() => _i652.DashboardBloc(
           gh<_i797.AuthBloc>(),

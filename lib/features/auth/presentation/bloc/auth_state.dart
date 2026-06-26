@@ -47,3 +47,16 @@ final class AuthForgotPasswordSuccess extends AuthState {
   @override
   List<Object> get props => [email];
 }
+
+final class AuthResendVerificationSuccess extends AuthState {
+  const AuthResendVerificationSuccess();
+}
+
+final class AuthResendVerificationFailure extends AuthState {
+  final String message;
+
+  const AuthResendVerificationFailure({required this.message});
+
+  @override
+  List<Object> get props => [message];
+}

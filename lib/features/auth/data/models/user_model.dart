@@ -26,7 +26,7 @@ class UserModel extends UserEntity {
       subscriptionPlan: json['subscription_plan'] != null
           ? SubscriptionPlan.values.byName(json['subscription_plan'] as String)
           : SubscriptionPlan.free,
-      isEmailVerified: json['is_email_verified'] as bool? ?? true,
+      isEmailVerified: (json['email_verified'] ?? json['is_email_verified']) as bool? ?? false,
       createdAt: DateTime.tryParse(json['created_at'] as String? ?? '') ?? DateTime.now(),
       lastLoginAt: json['last_login_at'] != null
           ? DateTime.tryParse(json['last_login_at'] as String)

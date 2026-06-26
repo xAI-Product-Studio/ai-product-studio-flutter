@@ -116,6 +116,21 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
+  Future<Either<Failure, void>> resendVerification() async {
+    try {
+      await _remoteDataSource.resendVerification();
+      return const Right(null);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message, statusCode: e.statusCode));
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(message: e.message));
+    } catch (e, st) {
+      _logger.e('Beklenmedik hata (resendVerification)', error: e, stackTrace: st);
+      return const Left(ServerFailure(message: 'Doğrulama e-postası gönderilemedi.'));
+    }
+  }
+
+  @override
   Future<Either<Failure, bool>> isAuthenticated() async {
     try {
       final hasToken = await _storage.hasAccessToken();
